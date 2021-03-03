@@ -20,8 +20,5 @@ This app was built using [Express.js](https://expressjs.com/)
 * To run the application, run `node server.js`
 * Navigate to https://localhost/3000 to view the app live
 
-## Contribution Instructions
-*Not currently looking for contributions, but feel free to download and run it locally.*
 
-### Supporting Images
-![Image of Application](./public/assets/images/ScreenShot.JPG)
+
