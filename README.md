@@ -24,4 +24,4 @@ This app was built using [Express.js](https://expressjs.com/)
 *Not currently looking for contributions, but feel free to download and run it locally.*
 
 ### Supporting Images
-![Image of Application](https://github.com/HishamKafer/rut-hw8-notetaker/blob/main/img/Screen%20Shot%202020-11-17%20at%2011.03.34%20AM.png)
+![Image of Application](.assets/images/ScreenShot.jpg)
