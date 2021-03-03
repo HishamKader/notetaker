@@ -1,53 +1,71 @@
-// DEPENDECIES
-// =============================================================
-var fs = require('fs');
-const { request } = require('http');
-var data = fs.readFileSync('./data/db.json');
-var notesData = JSON.parse(data);
-var path = require('path');
-var notesArray = require("../data/db.json")
+const fs = require('fs');
+const util = require('util');
+const {v4: uuidv4} = require('uuid'); //used to create an id automatically//call this in post.
+const { json } = require('express');
+const readFileAsync = util.promisify(fs.readFile);
+const writeFileAsync = util.promisify(fs.writeFile);
+module.exports = function(app) {
 
-// =============================================================
+//   const readNotes = fs.readFile('../data/db.json', 'utf8', (error, data) =>
+//   error ? console.error(error) : console.log(data)
+// );
 
+  // API GET Requests
+  // Below code handles when users "visit" a page.
+  // In each of the below cases when a user visits a link
+  // (ex: localhost:PORT/api/admin... they are shown a JSON of the data in the table)
+  // ---------------------------------------------------------------------------
+  app.get("/api/notes", function(req, res) {
+    return readFileAsync("data/db.json", "utf8").then((notes)=> {
+      let parsedNotes; //parsedNotes
+      try {
+        parsedNotes = [].concat(JSON.parse(notes));
+        console.log(parsedNotes);
+      } catch (error) {
+        parsedNotes = [];
+      }
+      return parsedNotes;
+    }).then((notes)=> res.json(notes))
+    .catch((err)=> res.status(500).json(err))
+  });
+  
+  //POSTing a new note to /api/notes
+  app.post("/api/notes", function(req, res) {
+    let uniqueID = uuidv4();
+    let newNote = {
+      title: req.body.title,
+      text: req.body.text,
+      id: uniqueID
+    };
+    readFileAsync("data/db.json", "utf8", (err,data)=> {
+      if (err) throw err;
 
+      const notes = JSON.parse(data);
+      notes.push(newNote); 
 
-// ROUTING
-// =============================================================
-module.exports = function (app) {
+      writeFileAsync("data/db.json", JSON.stringify(notes), err => {
+        if (err) throw err;
+        res.send("data/db.json");
+        console.log("New note created");
+      })
+    })
+  })
+  
+  //now to delete..
+  app.delete("/api/notes/:id", function(req, res) {
+    const id = req.params.id;
+    return readFileAsync("data/db.json", "utf8").then((notes)=> {
+      let parsedNotes;
+      try {
+        parsedNotes = [].concat(JSON.parse(notes));
+        console.log(parsedNotes);
+      } catch (error) {
+        parsedNotes = [];
+      }
+      return parsedNotes;
+    }).then((notes)=> notes.filter((note)=> note.id !== id))
+    .then((filteredNotes) => {return writeFileAsync("data/db.json", JSON.stringify(filteredNotes))})
+  //identify id // post
+  })
 
-    //Displays all Notes in JSON file
-    app.get("/api/notes", function (req, res) {
-        res.sendFile(path.join(__dirname, '../data', 'db.json'));
-        console.log("success!!!!")
-    });
-
-
-    app.post("/api/notes", function (req, res) {
-        let note = req.body;
-        let newID = notesArray.length;
-        note.id = newID;
-
-        notesArray.push(note)
-
-        fs.writeFile('./data/db.json', JSON.stringify
-            (notesArray), (err) => err ? console.error(err) : console.log("success"))
-        res.send("completed!")
-    }
-    );
-
-    app.delete("/api/notes/:id", function (req, res) {
-        console.log(req.params.id)
-        var selection = parseInt(req.params.id);
-        console.log(notesArray[selection].id, "line 41");
-        notesArray = notesArray.filter(function(x) {
-            if (x.id !== selection) {
-                return true;
-            }
-        })
-        console.log(notesArray, "line 46 bro");
-        fs.writeFile('./data/db.json', JSON.stringify
-            (notesArray), (err) => err ? console.error(err) : console.log("success"))
-        res.send("completed!")
-    });
-
-}
+};
