@@ -24,4 +24,4 @@ This app was built using [Express.js](https://expressjs.com/)
 *Not currently looking for contributions, but feel free to download and run it locally.*
 
 ### Supporting Images
-![Image of Application](../public/assets/images/ScreenShot.jpg)
+![Image of Application](./public/assets/images/ScreenShot.JPG)
